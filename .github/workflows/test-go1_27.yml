@@ -64,7 +64,6 @@ jobs:
       - name: Set-up Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go/src/go.mod'
           check-latest: true
 
       - name: Build patched Go
