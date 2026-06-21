@@ -478,9 +478,11 @@ var osVersionInfo struct {
 }
 
 func initOsVersionInfo() {
+	print("Go compatibility build [Aureus] for legacy Windows\n")
 	info := windows.OSVERSIONINFOW{}
 	info.OSVersionInfoSize = uint32(unsafe.Sizeof(info))
 	stdcall(_RtlGetVersion, uintptr(unsafe.Pointer(&info)))
+	print("Running on Windows NT ", info.MajorVersion, ".", info.MinorVersion, ".", info.BuildNumber, "\n")
 	osVersionInfo.majorVersion = info.MajorVersion
 	osVersionInfo.minorVersion = info.MinorVersion
 	osVersionInfo.buildNumber = info.BuildNumber
