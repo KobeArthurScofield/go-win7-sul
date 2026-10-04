@@ -45,17 +45,17 @@ jobs:
           ref: ${{ matrix.buildtarget }}
           path: 'go'
 
-      - name: Download patch
-        uses: actions/checkout@v7
-        with:
-          path: 'patch'
+      #- name: Download patch
+      #  uses: actions/checkout@v7
+      #  with:
+      #    path: 'patch'
 
-      # Patches for Go 1.27.x before more minor changes introduces.
-      - name: Apply patch
-        run: |
-          cd ./go
-          patch --verbose -p 1 < ../patch/go-1-27.diff
-          cd ..
+      ## Patches for Go 1.27.x before more minor changes introduces.
+      #- name: Apply patch
+      #  run: |
+      #    cd ./go
+      #    patch --verbose -p 1 < ../patch/go-1-27.diff
+      #    cd ..
 
       - name: Set-up Go
         uses: actions/setup-go@v7
