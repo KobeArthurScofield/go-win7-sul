@@ -14,7 +14,7 @@ switch ($Action) {
         Push-Location go
         try {
             foreach ($patchFile in $Parameters) {
-                git apply --verbose -p 1 "..\patch\$patchFile"
+                patch --verbose -p 1 -i "..\patch\$patchFile"
                 if ($LASTEXITCODE -ne 0) {
                     throw "Applying patch failed: $patchFile"
                 }

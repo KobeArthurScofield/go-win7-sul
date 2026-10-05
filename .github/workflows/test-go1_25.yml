@@ -53,11 +53,9 @@ jobs:
 
       # Patches for Go 1.25.x before more minor changes introduces.
       - name: Apply patch
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go
-          patch --verbose -p 1 < ../patch/go-1-25.diff
-          cd ..
+          & .\patch\.github\scripts\windows-workflow.ps1 ApplyPatch go-1-25.diff
 
       - name: Set-up Go
         uses: actions/setup-go@v7
@@ -141,12 +139,9 @@ jobs:
           path: 'patch'
 
       - name: Apply patch
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go
-          patch --verbose -p 1 < ../patch/go-1-25.diff
-          patch --verbose -p 1 < ../patch/legacy-1-25.diff
-          cd ..
+          & .\patch\.github\scripts\windows-workflow.ps1 ApplyPatch go-1-26.diff legacy-1-26.diff
 
       - name: Upload package to Artifacts
         uses: actions/upload-artifact@v7
