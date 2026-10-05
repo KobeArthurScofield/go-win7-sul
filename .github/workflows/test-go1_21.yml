@@ -18,7 +18,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: write
     strategy:
@@ -33,6 +33,7 @@ jobs:
       CGO_ENABLED: 0
     steps:
       - name: Show workflow information
+        shell: bash
         run: |
           _NAME="$GOOS-$GOARCH"
           echo "GOOS: $GOOS, GOARCH: $GOARCH, APPLY-BRANCH: ${{ matrix.buildtarget }}"
@@ -52,6 +53,7 @@ jobs:
 
       # Patches for Go 1.21.x before more minor changes introduces.
       - name: Apply patch
+        shell: bash
         run: |
           cd ./go
           patch --verbose -p 1 < ../patch/go-1-21.diff
@@ -100,7 +102,7 @@ jobs:
             ./go/*
 
   source:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: write
     steps:
@@ -117,6 +119,7 @@ jobs:
           path: 'patch'
 
       - name: Apply patch
+        shell: bash
         run: |
           cd ./go
           patch --verbose -p 1 < ../patch/go-1-21.diff
@@ -130,7 +133,7 @@ jobs:
             ./go/*
 
   legacy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: write
     strategy:
@@ -151,6 +154,7 @@ jobs:
           path: 'patch'
 
       - name: Apply patch
+        shell: bash
         run: |
           cd ./go
           patch --verbose -p 1 < ../patch/go-1-21.diff

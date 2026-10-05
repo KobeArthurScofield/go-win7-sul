@@ -16,7 +16,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: write
     strategy:
@@ -31,6 +31,7 @@ jobs:
       CGO_ENABLED: 0
     steps:
       - name: Show workflow information
+        shell: bash
         run: |
           _NAME="$GOOS-$GOARCH"
           echo "GOOS: $GOOS, GOARCH: $GOARCH, GOVER: ${{ matrix.buildtarget }}"
@@ -50,6 +51,7 @@ jobs:
 
       # Patches for Go 1.27.x before more minor changes introduces.
       - name: Apply patch
+        shell: bash
         run: |
           cd ./go
           patch --verbose -p 1 < ../patch/go-1-27.diff
@@ -91,6 +93,7 @@ jobs:
           cd ..
 
       - name: Copy License
+        shell: bash
         run: |
           cp -f ./patch/LICENSE ./go/
 
@@ -111,6 +114,7 @@ jobs:
 
       - name: Compute hashes for file
         if: github.event_name == 'release'
+        shell: bash
         run: |
           cd ./go/
           FILE=./go-for-win7-${{ env.ASSET_NAME }}.zip

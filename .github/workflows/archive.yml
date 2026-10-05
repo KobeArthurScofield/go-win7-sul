@@ -5,7 +5,7 @@ on:
 
 jobs:
   format-release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: write
     steps:
@@ -26,7 +26,7 @@ jobs:
           prerelease: true
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: format-release
     permissions:
       contents: write
@@ -36,6 +36,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Show workflow information
+        shell: bash
         run: |
           _NAME="go-win7-win6-1.${{ matrix.buildtarget }}"
           echo "SOURCE PACKET GOVER: 1.${{ matrix.buildtarget }}"
@@ -54,12 +55,14 @@ jobs:
           path: 'patch'
 
       - name: Apply patch
+        shell: bash
         run: |
           cd ./go
           patch --verbose -p 1 < ../patch/go-1-${{ matrix.buildtarget }}.diff
           cd ..
 
       - name: Copy License
+        shell: bash
         run: |
           cp -f ./patch/LICENSE ./go/
 
@@ -78,6 +81,7 @@ jobs:
           cd ../
 
       - name: Compute hashes for file
+        shell: bash
         run: |
           cd ./go/
           FILE=./${{ env.ASSET_NAME }}.zip
@@ -97,7 +101,7 @@ jobs:
           file_glob: true
 
   legacy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: format-release
     permissions:
       contents: write
@@ -107,6 +111,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Show workflow information
+        shell: bash
         run: |
           _NAME="go-win7-win6-1.${{ matrix.buildtarget }}-legacy"
           echo "SOURCE PACKET GOVER: 1.${{ matrix.buildtarget }}"
@@ -125,6 +130,7 @@ jobs:
           path: 'patch'
 
       - name: Apply patch
+        shell: bash
         run: |
           cd ./go
           patch --verbose -p 1 < ../patch/go-1-${{ matrix.buildtarget }}.diff
@@ -132,6 +138,7 @@ jobs:
           cd ..
 
       - name: Copy License
+        shell: bash
         run: |
           cp -f ./patch/LICENSE ./go/
 
@@ -150,6 +157,7 @@ jobs:
           cd ../
 
       - name: Compute hashes for file
+        shell: bash
         run: |
           cd ./go/
           FILE=./${{ env.ASSET_NAME }}.zip
