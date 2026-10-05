@@ -141,7 +141,7 @@ jobs:
       - name: Apply patch
         shell: pwsh
         run: |
-          & .\patch\.github\scripts\windows-workflow.ps1 ApplyPatch go-1-26.diff legacy-1-26.diff
+          & .\patch\.github\scripts\windows-workflow.ps1 ApplyPatch go-1-25.diff legacy-1-25.diff
 
       - name: Upload package to Artifacts
         uses: actions/upload-artifact@v7
