@@ -33,11 +33,11 @@ jobs:
       CGO_ENABLED: 0
     steps:
       - name: Show workflow information
-        shell: bash
+        shell: pwsh
         run: |
-          _NAME="$GOOS-$GOARCH"
-          echo "GOOS: $GOOS, GOARCH: $GOARCH, APPLY-BRANCH: ${{ matrix.buildtarget }}"
-          echo "ASSET_NAME=$_NAME" >> $GITHUB_ENV
+          $assetName = "$env:GOOS-$env:GOARCH"
+          Write-Output "GOOS: $env:GOOS, GOARCH: $env:GOARCH, APPLY-BRANCH: ${{ matrix.buildtarget }}"
+          "ASSET_NAME=$assetName" >> $env:GITHUB_ENV
 
       - name: Download source
         uses: actions/checkout@v7
@@ -53,11 +53,9 @@ jobs:
 
       # Patches for Go 1.21.x before more minor changes introduces.
       - name: Apply patch
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go
-          patch --verbose -p 1 < ../patch/go-1-21.diff
-          cd ..
+          & .\patch\.github\scripts\windows-workflow.ps1 ApplyPatch go-1-21.diff
 
       - name: Set-up Go
         uses: actions/setup-go@v7
@@ -66,33 +64,22 @@ jobs:
           check-latest: true
 
       - name: Build patched Go
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go/src
-          . ./make.bash "$@" --no-banner
-          "$GOTOOLDIR/dist" banner
-          cd ../..
+          Push-Location go/src
+          try {
+            & .\make.bat --no-banner
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            & "$env:GOTOOLDIR\dist.exe" banner
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          finally { Pop-Location }
 
       - name: Copy binaries into bin
         if: matrix.goos != 'linux' || matrix.goarch != 'amd64'
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go/bin
-          DIR="${GOOS}_${GOARCH}"
-          if [ -d "${DIR}" ]; then
-            echo "Found ${DIR} copying binaries"
-            rm ./go*
-            for BINARY in "${DIR}"/*
-            do
-              echo "mv ./${BINARY} ./"
-              mv ./${BINARY} ./
-            done
-            rm -r ./"${DIR}"
-            rm -r ../pkg/tool/linux_amd64/
-          fi
-          cd ..
-          ls -al ./bin
-          cd ..
+          & .\patch\.github\scripts\windows-workflow.ps1 PromoteBinaries
 
       - name: Upload package to Artifacts
         uses: actions/upload-artifact@v7
@@ -119,11 +106,9 @@ jobs:
           path: 'patch'
 
       - name: Apply patch
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go
-          patch --verbose -p 1 < ../patch/go-1-21.diff
-          cd ..
+          & .\patch\.github\scripts\windows-workflow.ps1 ApplyPatch go-1-21.diff
 
       - name: Upload package to Artifacts
         uses: actions/upload-artifact@v7
@@ -154,12 +139,9 @@ jobs:
           path: 'patch'
 
       - name: Apply patch
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go
-          patch --verbose -p 1 < ../patch/go-1-21.diff
-          patch --verbose -p 1 < ../patch/legacy-1-21.diff
-          cd ..
+          & .\patch\.github\scripts\windows-workflow.ps1 ApplyPatch go-1-21.diff legacy-1-21.diff
 
       - name: Upload package to Artifacts
         uses: actions/upload-artifact@v7

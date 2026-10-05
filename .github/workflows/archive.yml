@@ -36,11 +36,11 @@ jobs:
       fail-fast: false
     steps:
       - name: Show workflow information
-        shell: bash
+        shell: pwsh
         run: |
-          _NAME="go-win7-win6-1.${{ matrix.buildtarget }}"
-          echo "SOURCE PACKET GOVER: 1.${{ matrix.buildtarget }}"
-          echo "ASSET_NAME=$_NAME" >> $GITHUB_ENV
+          $assetName = "go-win7-win6-1.${{ matrix.buildtarget }}"
+          Write-Output "SOURCE PACKET GOVER: 1.${{ matrix.buildtarget }}"
+          "ASSET_NAME=$assetName" >> $env:GITHUB_ENV
 
       - name: Download source
         uses: actions/checkout@v7
@@ -55,16 +55,14 @@ jobs:
           path: 'patch'
 
       - name: Apply patch
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go
-          patch --verbose -p 1 < ../patch/go-1-${{ matrix.buildtarget }}.diff
-          cd ..
+          & .\patch\.github\scripts\windows-workflow.ps1 ApplyPatch go-1-${{ matrix.buildtarget }}.diff
 
       - name: Copy License
-        shell: bash
+        shell: pwsh
         run: |
-          cp -f ./patch/LICENSE ./go/
+          & .\patch\.github\scripts\windows-workflow.ps1 CopyLicense
 
       - name: Upload package to Artifacts
         uses: actions/upload-artifact@v7
@@ -74,23 +72,14 @@ jobs:
             ./go/*
 
       - name: create ZIP archive
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go/
-          zip -9vr ./${{ env.ASSET_NAME }}.zip . -x "./.*" "./.*/*" "./**/.*" "./**/.*/*" "./**/*_test.go" "./**/testdata"
-          cd ../
+          & .\patch\.github\scripts\windows-workflow.ps1 CreateZip "${{ env.ASSET_NAME }}.zip"
 
       - name: Compute hashes for file
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go/
-          FILE=./${{ env.ASSET_NAME }}.zip
-          DGST=$FILE.dgst
-          for METHOD in {"md5","sha1","sha256","sha512"}
-          do
-            openssl dgst -$METHOD $FILE | sed 's/([^)]*)//g' >>$DGST
-          done
-          cd ../
+          & .\patch\.github\scripts\windows-workflow.ps1 ComputeHashes "${{ env.ASSET_NAME }}.zip"
 
       - name: Upload packages to release
         uses: svenstaro/upload-release-action@v2
@@ -111,11 +100,11 @@ jobs:
       fail-fast: false
     steps:
       - name: Show workflow information
-        shell: bash
+        shell: pwsh
         run: |
-          _NAME="go-win7-win6-1.${{ matrix.buildtarget }}-legacy"
-          echo "SOURCE PACKET GOVER: 1.${{ matrix.buildtarget }}"
-          echo "ASSET_NAME=$_NAME" >> $GITHUB_ENV
+          $assetName = "go-win7-win6-1.${{ matrix.buildtarget }}-legacy"
+          Write-Output "SOURCE PACKET GOVER: 1.${{ matrix.buildtarget }}"
+          "ASSET_NAME=$assetName" >> $env:GITHUB_ENV
 
       - name: Download source
         uses: actions/checkout@v7
@@ -130,17 +119,14 @@ jobs:
           path: 'patch'
 
       - name: Apply patch
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go
-          patch --verbose -p 1 < ../patch/go-1-${{ matrix.buildtarget }}.diff
-          patch --verbose -p 1 < ../patch/legacy-1-${{ matrix.buildtarget }}.diff
-          cd ..
+          & .\patch\.github\scripts\windows-workflow.ps1 ApplyPatch go-1-${{ matrix.buildtarget }}.diff legacy-1-${{ matrix.buildtarget }}.diff
 
       - name: Copy License
-        shell: bash
+        shell: pwsh
         run: |
-          cp -f ./patch/LICENSE ./go/
+          & .\patch\.github\scripts\windows-workflow.ps1 CopyLicense
 
       - name: Upload package to Artifacts
         uses: actions/upload-artifact@v7
@@ -150,23 +136,14 @@ jobs:
             ./go/*
 
       - name: create ZIP archive
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go/
-          zip -9vr ./${{ env.ASSET_NAME }}.zip . -x "./.*" "./.*/*" "./**/.*" "./**/.*/*" "./**/*_test.go" "./**/testdata"
-          cd ../
+          & .\patch\.github\scripts\windows-workflow.ps1 CreateZip "${{ env.ASSET_NAME }}.zip"
 
       - name: Compute hashes for file
-        shell: bash
+        shell: pwsh
         run: |
-          cd ./go/
-          FILE=./${{ env.ASSET_NAME }}.zip
-          DGST=$FILE.dgst
-          for METHOD in {"md5","sha1","sha256","sha512"}
-          do
-            openssl dgst -$METHOD $FILE | sed 's/([^)]*)//g' >>$DGST
-          done
-          cd ../
+          & .\patch\.github\scripts\windows-workflow.ps1 ComputeHashes "${{ env.ASSET_NAME }}.zip"
 
       - name: Upload packages to release
         uses: svenstaro/upload-release-action@v2
