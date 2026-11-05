@@ -5,6 +5,7 @@
 #include "go_asm.h"
 #include "go_tls.h"
 #include "textflag.h"
+#include "time_windows.h"
 #include "funcdata.h"
 #include "cgo/abi_amd64.h"
 
@@ -209,4 +210,11 @@ TEXT runtime·nanotime2<ABIInternal>(SB),NOSPLIT,$32-0
 	MOVL	DX, 0x68(AX)
 	MOVQ	24(SP), AX
 	IMULQ	$100, AX
+	RET
+
+TEXT runtime·nanotimel(SB),NOSPLIT,$0-8
+	MOVQ	$_INTERRUPT_TIME, DI
+	MOVQ	time_lo(DI), AX
+	IMULQ	$100, AX
+	MOVQ	AX, ret+0(FP)
 	RET
